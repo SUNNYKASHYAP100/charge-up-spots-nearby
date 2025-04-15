@@ -2,8 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Zap, Clock, Star, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { MapPin, Zap, Clock, Star } from 'lucide-react';
 
 export interface StationProps {
   id: string;
@@ -18,7 +17,10 @@ export interface StationProps {
   amenities: string[];
 }
 
-export function StationCard({ station }: { station: StationProps }) {
+export function StationCard({ station, onBookingClick }: { 
+  station: StationProps; 
+  onBookingClick: (stationId: string) => void;
+}) {
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-md">
       <CardHeader className="pb-2">
@@ -72,11 +74,13 @@ export function StationCard({ station }: { station: StationProps }) {
       </CardContent>
       <CardFooter className="pt-2 flex justify-between items-center">
         <span className="font-medium">{station.price}</span>
-        <Link to={`/stations/${station.id}`}>
-          <Button size="sm" className="bg-gradient-to-r from-ev-blue to-ev-green hover:from-ev-blue hover:to-ev-indigo">
-            Book Now <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
-        </Link>
+        <Button 
+          size="sm" 
+          className="bg-gradient-to-r from-ev-blue to-ev-green hover:from-ev-blue hover:to-ev-indigo"
+          onClick={() => onBookingClick(station.id)}
+        >
+          Book Now
+        </Button>
       </CardFooter>
     </Card>
   );

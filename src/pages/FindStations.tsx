@@ -65,12 +65,11 @@ const FindStations = () => {
                 <TabsContent value="list">
                   <div className="grid gap-4">
                     {stations.map(station => (
-                      <div 
-                        key={station.id}
-                        onClick={() => handleBookingClick(station.id)}
-                        className="cursor-pointer"
-                      >
-                        <StationCard station={station} />
+                      <div key={station.id}>
+                        <StationCard 
+                          station={station} 
+                          onBookingClick={handleBookingClick}
+                        />
                       </div>
                     ))}
                   </div>
