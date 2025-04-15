@@ -1,11 +1,26 @@
-
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, ChevronDown, LogOut } from 'lucide-react';
 import { Button } from './button';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.success('Successfully logged out!');
+      navigate('/');
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div className="relative bg-white shadow-sm">
@@ -19,7 +34,6 @@ export function Navbar() {
             </Link>
           </div>
           
-          {/* Mobile menu button */}
           <div className="-mr-2 -my-2 md:hidden">
             <Button 
               variant="ghost" 
@@ -31,7 +45,6 @@ export function Navbar() {
             </Button>
           </div>
           
-          {/* Desktop nav */}
           <nav className="hidden md:flex space-x-10">
             <Link to="/find-stations" className="text-base font-medium text-gray-500 hover:text-gray-900">
               Find Stations
@@ -47,7 +60,7 @@ export function Navbar() {
                 <span>EVs & Charging</span>
                 <ChevronDown className="ml-2 h-5 w-5 text-gray-400 group-hover:text-gray-500" aria-hidden="true" />
               </button>
-              <div className="absolute z-10 hidden group-hover:block -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2">
+              <div className="absolute z-10 hidden group-hover:block -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:-translate-x-1/2">
                 <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
                   <div className="relative grid gap-6 bg-white px-5 py-6 sm:gap-8 sm:p-8">
                     <Link to="/charging-guides" className="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50">
@@ -72,19 +85,31 @@ export function Navbar() {
           </nav>
           
           <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-            <Link to="/login" className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
-              Sign in
-            </Link>
-            <Link to="/register">
-              <Button className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-ev-blue to-ev-green hover:from-ev-blue hover:to-ev-indigo">
-                Sign up
+            {user ? (
+              <Button
+                onClick={handleLogout}
+                variant="ghost"
+                className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign out
               </Button>
-            </Link>
+            ) : (
+              <>
+                <Link to="/auth" className="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900">
+                  Sign in
+                </Link>
+                <Link to="/auth">
+                  <Button className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-ev-blue to-ev-green hover:from-ev-blue hover:to-ev-indigo">
+                    Sign up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
       {isMenuOpen && (
         <div className="absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden z-10">
           <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
@@ -128,14 +153,27 @@ export function Navbar() {
             </div>
             <div className="py-6 px-5 space-y-6">
               <div className="grid grid-cols-2 gap-y-4 gap-x-8">
-                <Link to="/login" className="text-base font-medium text-gray-900 hover:text-gray-700">
-                  Sign in
-                </Link>
-                <Link to="/register">
-                  <Button className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-ev-blue to-ev-green hover:from-ev-blue hover:to-ev-indigo">
-                    Sign up
+                {user ? (
+                  <Button
+                    onClick={handleLogout}
+                    variant="ghost"
+                    className="text-base font-medium text-gray-900 hover:text-gray-700"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign out
                   </Button>
-                </Link>
+                ) : (
+                  <>
+                    <Link to="/auth" className="text-base font-medium text-gray-900 hover:text-gray-700">
+                      Sign in
+                    </Link>
+                    <Link to="/auth">
+                      <Button className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-ev-blue to-ev-green hover:from-ev-blue hover:to-ev-indigo">
+                        Sign up
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
